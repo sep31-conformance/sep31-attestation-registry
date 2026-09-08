@@ -9,13 +9,31 @@ depend on trusting whoever runs the checker.
 Part of a project mirroring [`sep24-attestation-registry`](https://github.com/SEP-24-conform/sep24-attestation-registry)'s
 exact pattern, applied to SEP-31 instead of SEP-24:
 
-- `sep31-conformance` — the checking library + CLI. Produces the results this contract stores.
+- [`sep31-conformance`](https://github.com/sep31-conformance/sep31-conformance) — the checking library + CLI. Produces the results this contract stores.
 - **This repo** — the on-chain record.
-- `sep31-conformance-backend` — the API service that runs the checker and writes to this contract.
+- [`sep31-conformance-backend`](https://github.com/sep31-conformance/sep31-conformance-backend) — the API service that runs the checker and writes to this contract.
+- [`sep31-conformance-frontend`](https://github.com/sep31-conformance/sep31-conformance-frontend) — dashboard over that backend.
 
-(Cross-repo links above are left as plain names rather than URLs until
-all three repos are pushed under their final org — see each repo's own
-README once published for the live links.)
+```mermaid
+flowchart LR
+    Anchor[(Receiving anchor)]
+    Lib[sep31-conformance<br/>library + CLI]
+    BE[sep31-conformance-backend]
+    subgraph This repo
+        Contract[sep31-attestation-registry<br/>Soroban contract]
+    end
+    FE[sep31-conformance-frontend]
+
+    Lib -->|GET stellar.toml, GET /info| Anchor
+    BE -->|runs| Lib
+    BE -->|attest domain, passed, hash<br/>admin-signed| Contract
+    Contract -->|get_attestation domain<br/>no auth required| BE
+    FE -->|POST /api/checks, GET /api/registry/:domain/onchain| BE
+```
+
+This repo depends on nothing else in the project — pure Soroban contract
+code with no knowledge of the checker or backend beyond the shape of the
+data it's handed.
 
 ## Table of contents
 
