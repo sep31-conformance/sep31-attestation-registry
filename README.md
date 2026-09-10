@@ -1,4 +1,4 @@
-# sep31-attestation-registry
+# corridorlint-registry
 
 A minimal Soroban smart contract that stores on-chain attestations of
 [SEP-31](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0031.md)
@@ -9,20 +9,20 @@ depend on trusting whoever runs the checker.
 Part of a project mirroring [`sep24-attestation-registry`](https://github.com/SEP-24-conform/sep24-attestation-registry)'s
 exact pattern, applied to SEP-31 instead of SEP-24:
 
-- [`sep31-conformance`](https://github.com/sep31-conformance/sep31-conformance) — the checking library + CLI. Produces the results this contract stores.
+- [`corridorlint`](https://github.com/CorridorLint/corridorlint) — the checking library + CLI. Produces the results this contract stores.
 - **This repo** — the on-chain record.
-- [`sep31-conformance-backend`](https://github.com/sep31-conformance/sep31-conformance-backend) — the API service that runs the checker and writes to this contract.
-- [`sep31-conformance-frontend`](https://github.com/sep31-conformance/sep31-conformance-frontend) — dashboard over that backend.
+- [`corridorlint-backend`](https://github.com/CorridorLint/corridorlint-backend) — the API service that runs the checker and writes to this contract.
+- [`corridorlint-frontend`](https://github.com/CorridorLint/corridorlint-frontend) — dashboard over that backend.
 
 ```mermaid
 flowchart LR
     Anchor[(Receiving anchor)]
-    Lib[sep31-conformance<br/>library + CLI]
-    BE[sep31-conformance-backend]
+    Lib[corridorlint<br/>library + CLI]
+    BE[corridorlint-backend]
     subgraph This repo
-        Contract[sep31-attestation-registry<br/>Soroban contract]
+        Contract[corridorlint-registry<br/>Soroban contract]
     end
-    FE[sep31-conformance-frontend]
+    FE[corridorlint-frontend]
 
     Lib -->|GET stellar.toml, GET /info| Anchor
     BE -->|runs| Lib
@@ -57,7 +57,7 @@ data it's handed.
 
 ## Why this exists
 
-`sep31-conformance` can tell you, right now, whether a receiving anchor's
+`corridorlint` can tell you, right now, whether a receiving anchor's
 SEP-31 discovery surface matches spec. But that result only exists wherever the check
 happened to run. A sending anchor deciding whether to trust a corridor —
 or a directory site listing verified corridors — needs a durable,
@@ -91,14 +91,14 @@ exactly one poster. Concretely:
 
 - **Trust the admin key** to only submit attestations that reflect real
   conformance runs. The admin is a single Stellar account, currently held
-  by `sep31-conformance-backend`.
+  by `corridorlint-backend`.
 - You do **not** need to trust the admin to *not lie in the future about
   past results* — every write is a Stellar transaction, permanently
   visible in ledger history, signed by the admin key at the time it was
   submitted. The admin can overwrite what the *current* attestation for a
   domain says, but cannot rewrite the historical record of what it
   submitted and when.
-- Because `sep31-conformance` is open source, anyone can independently
+- Because `corridorlint` is open source, anyone can independently
   re-run the same check the admin claims to have run and compare against
   `result_hash` — the admin's claims are falsifiable, not just asserted.
 - If the admin key were compromised, an attacker could write false
@@ -113,7 +113,7 @@ flowchart LR
         A[Admin key]
     end
     subgraph Verifiable by anyone
-        B[sep31-conformance source code]
+        B[corridorlint source code]
         C[This contract's on-chain state]
         D[Ledger history of every attest tx]
     end
@@ -149,10 +149,10 @@ overwritten on each new `attest` call — current status, not a history log.
 
 ```mermaid
 sequenceDiagram
-    participant Backend as sep31-conformance-backend
-    participant Checker as sep31-conformance (library)
+    participant Backend as corridorlint-backend
+    participant Checker as corridorlint (library)
     participant Anchor as Receiving anchor
-    participant Contract as sep31-attestation-registry
+    participant Contract as corridorlint-registry
 
     Backend->>Checker: runConformanceSuite(domain)
     Checker->>Anchor: GET stellar.toml, GET /info
@@ -213,7 +213,7 @@ own development.
   data," not "loss of funds."
 - **`domain` is an unvalidated string.** The contract does not check that
   `domain` looks like a real hostname — that validation happens in
-  `sep31-conformance-backend` before it ever calls `attest`. Anyone
+  `corridorlint-backend` before it ever calls `attest`. Anyone
   reading from this contract directly (bypassing the backend) should not
   assume `domain` keys are well-formed.
 - **Admin rotation is a single transaction with no timelock.** See
@@ -294,7 +294,7 @@ reason.
 
 ## What this deliberately does not do
 
-- Run conformance checks itself (that's `sep31-conformance`'s job).
+- Run conformance checks itself (that's `corridorlint`'s job).
 - Store more than the latest attestation per domain.
 - Provide any reputation, scoring, or ranking beyond a single pass/fail
   bit.
@@ -321,7 +321,7 @@ avoid a code-reuse question that reusing the *source*, not the
 
 **Does this contract know or care what SEP-31 actually requires?** No —
 same as its sibling, it has no opinion on what "conformant" means; that
-logic lives entirely in `sep31-conformance`. This contract only stores
+logic lives entirely in `corridorlint`. This contract only stores
 whatever it's told, gated by the admin key.
 
 **What happens if the admin key is lost?** Nothing already-written is
@@ -334,7 +334,7 @@ new contract ID.
 
 **Can anyone call `get_attestation`?** Yes — no authentication required,
 and it costs only the standard Soroban simulation/read cost, not a full
-signed transaction. See `sep31-conformance-backend`'s
+signed transaction. See `corridorlint-backend`'s
 `/api/registry/:domain/onchain` endpoint for a worked example of a
 trustless read.
 

@@ -2,7 +2,7 @@
 
 //! On-chain registry of SEP-31 corridor conformance attestations.
 //!
-//! An off-chain checker (see the `sep31-conformance` and backend repos)
+//! An off-chain checker (see the `corridorlint` and backend repos)
 //! independently verifies that a given receiving anchor's SEP-31
 //! discovery surface (stellar.toml + GET /info) conforms to spec, then
 //! submits the result here. Wallets, sending anchors, and directory
