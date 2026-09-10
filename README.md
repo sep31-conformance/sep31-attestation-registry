@@ -9,10 +9,10 @@ depend on trusting whoever runs the checker.
 Part of a project mirroring [`sep24-attestation-registry`](https://github.com/SEP-24-conform/sep24-attestation-registry)'s
 exact pattern, applied to SEP-31 instead of SEP-24:
 
-- [`corridorlint`](https://github.com/CorridorLint/corridorlint) — the checking library + CLI. Produces the results this contract stores.
+- [`corridorlint`](https://github.com/sep31-conformance/corridorlint) — the checking library + CLI. Produces the results this contract stores.
 - **This repo** — the on-chain record.
-- [`corridorlint-backend`](https://github.com/CorridorLint/corridorlint-backend) — the API service that runs the checker and writes to this contract.
-- [`corridorlint-frontend`](https://github.com/CorridorLint/corridorlint-frontend) — dashboard over that backend.
+- [`corridorlint-backend`](https://github.com/sep31-conformance/corridorlint-backend) — the API service that runs the checker and writes to this contract.
+- [`corridorlint-frontend`](https://github.com/sep31-conformance/corridorlint-frontend) — dashboard over that backend.
 
 ```mermaid
 flowchart LR
